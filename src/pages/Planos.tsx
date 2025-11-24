@@ -334,20 +334,6 @@ export default function Planos() {
             </Card>
           </div>
         )}
-
-        {!isTrialActive && !hasActiveSubscription && user && (
-          <div className="text-center mt-8">
-            <Card className="p-6 max-w-2xl mx-auto bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800">
-              <h3 className="text-xl font-semibold mb-2 text-orange-700 dark:text-orange-300">
-                ⚠️ Período de teste expirado
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                Seu período de 7 dias gratuitos terminou. Seus dados estão salvos e seguros.
-                Assine agora para continuar usando o sistema com todas as funcionalidades.
-              </p>
-            </Card>
-          </div>
-        )}
       </div>
     </div>
   );
