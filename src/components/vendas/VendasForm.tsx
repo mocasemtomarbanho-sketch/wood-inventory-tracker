@@ -49,8 +49,13 @@ export function VendasForm({ onSuccess }: VendasFormProps) {
       if (error) throw error;
 
       // Tocar som de caixa registradora
-      const audio = new Audio('/sounds/cash-register.mp3');
-      audio.play().catch(err => console.log('Erro ao tocar som:', err));
+      try {
+        const audio = new Audio('/sounds/cash-register.mp3');
+        audio.volume = 0.5;
+        await audio.play();
+      } catch (audioError) {
+        console.error('Erro ao tocar som:', audioError);
+      }
 
       toast({
         title: "Sucesso!",
