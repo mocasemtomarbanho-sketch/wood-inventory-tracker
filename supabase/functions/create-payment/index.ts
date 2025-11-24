@@ -55,8 +55,8 @@ serve(async (req) => {
 
     console.log('Creating PIX payment with Pushinpay:', paymentData);
 
-    // URL correta da API Pushinpay
-    const pushinpayResponse = await fetch('https://api.pushinpay.com.br/api/pix', {
+    // URL correta da API Pushinpay para criar PIX
+    const pushinpayResponse = await fetch('https://api.pushinpay.com.br/api/pix/cashIn', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${pushinpayToken}`,
