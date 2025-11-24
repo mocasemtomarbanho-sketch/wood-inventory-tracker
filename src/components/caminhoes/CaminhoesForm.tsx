@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { formatInTimeZone } from 'date-fns-tz';
 
 interface CaminhoesFormProps {
   onSuccess: () => void;
@@ -16,7 +17,7 @@ export function CaminhoesForm({ onSuccess }: CaminhoesFormProps) {
   const [placa, setPlaca] = useState("");
   const [motorista, setMotorista] = useState("");
   const [tipoCarga, setTipoCarga] = useState("");
-  const [dataEntrada, setDataEntrada] = useState(new Date().toISOString().slice(0, 16));
+  const [dataEntrada, setDataEntrada] = useState(formatInTimeZone(new Date(), 'America/Sao_Paulo', "yyyy-MM-dd'T'HH:mm"));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +55,7 @@ export function CaminhoesForm({ onSuccess }: CaminhoesFormProps) {
       setPlaca("");
       setMotorista("");
       setTipoCarga("");
-      setDataEntrada(new Date().toISOString().slice(0, 16));
+      setDataEntrada(formatInTimeZone(new Date(), 'America/Sao_Paulo', "yyyy-MM-dd'T'HH:mm"));
       onSuccess();
     } catch (error: any) {
       toast({
