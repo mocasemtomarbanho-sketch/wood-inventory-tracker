@@ -27,8 +27,8 @@ serve(async (req) => {
       throw new Error('Pushinpay token not configured');
     }
 
-    // Valor de teste (R$ 0,50 em centavos)
-    const amount = 50;
+    // Valor do plano mensal (R$ 100,00 em centavos)
+    const amount = 10000;
 
     // Criar ou atualizar assinatura com status pending
     const { error: subscriptionError } = await supabase
@@ -75,12 +75,23 @@ serve(async (req) => {
     const paymentResult = await pushinpayResponse.json();
     console.log('PIX payment created:', paymentResult);
 
-    // Atualizar assinatura com transaction_id
+    // Atualizar assinatura com transaction_id e valor
     if (paymentResult.id) {
-      await supabase
+      const { data: subscription } = await supabase
         .from('subscriptions')
-        .update({ punshipay_transaction_id: paymentResult.id })
-        .eq('user_id', userId);
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+
+      if (subscription) {
+        await supabase
+          .from('subscriptions')
+          .update({ 
+            punshipay_transaction_id: paymentResult.id,
+            amount: 100 // R$ 100,00
+          })
+          .eq('id', subscription.id);
+      }
     }
 
     return new Response(
