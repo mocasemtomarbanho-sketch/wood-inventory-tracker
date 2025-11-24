@@ -22,13 +22,13 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const punshipayToken = Deno.env.get('PUNSHIPAY_TOKEN');
-    if (!punshipayToken) {
-      throw new Error('Punshipay token not configured');
+    const pushinpayToken = Deno.env.get('PUNSHIPAY_TOKEN');
+    if (!pushinpayToken) {
+      throw new Error('Pushinpay token not configured');
     }
 
-    // Valor do plano mensal
-    const amount = 100.00;
+    // Valor do plano mensal (R$ 100,00 em centavos)
+    const amount = 10000;
 
     // Criar ou atualizar assinatura com status pending
     const { error: subscriptionError } = await supabase
@@ -36,7 +36,7 @@ serve(async (req) => {
       .upsert({
         user_id: userId,
         plan_id: planId,
-        amount: amount,
+        amount: amount / 100,
         status: 'pending'
       }, {
         onConflict: 'user_id'
@@ -47,38 +47,33 @@ serve(async (req) => {
       throw subscriptionError;
     }
 
-    // Criar pagamento no Punshipay
+    // Criar pagamento PIX no Pushinpay
     const paymentData = {
-      amount: amount,
-      description: `Assinatura Mensal - PalletePro`,
-      customer_email: userId, // Você pode buscar o email do usuário se necessário
-      return_url: `${req.headers.get('origin') || 'http://localhost:8080'}/planos`,
-      webhook_url: `${supabaseUrl}/functions/v1/punshipay-webhook`,
-      metadata: {
-        user_id: userId,
-        plan_id: planId
-      }
+      value: amount, // Valor em centavos
+      webhook_url: `${supabaseUrl}/functions/v1/punshipay-webhook`
     };
 
-    console.log('Creating payment with Punshipay:', paymentData);
+    console.log('Creating PIX payment with Pushinpay:', paymentData);
 
-    const punshipayResponse = await fetch('https://api.punshipay.com/v1/payments', {
+    // URL correta da API Pushinpay
+    const pushinpayResponse = await fetch('https://api.pushinpay.com.br/api/pix', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${punshipayToken}`,
+        'Authorization': `Bearer ${pushinpayToken}`,
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(paymentData),
     });
 
-    if (!punshipayResponse.ok) {
-      const errorText = await punshipayResponse.text();
-      console.error('Punshipay API error:', errorText);
-      throw new Error(`Punshipay API error: ${errorText}`);
+    if (!pushinpayResponse.ok) {
+      const errorText = await pushinpayResponse.text();
+      console.error('Pushinpay API error:', pushinpayResponse.status, errorText);
+      throw new Error(`Pushinpay API error: ${errorText}`);
     }
 
-    const paymentResult = await punshipayResponse.json();
-    console.log('Payment created:', paymentResult);
+    const paymentResult = await pushinpayResponse.json();
+    console.log('PIX payment created:', paymentResult);
 
     // Atualizar assinatura com transaction_id
     if (paymentResult.id) {
@@ -90,9 +85,11 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ 
-        success: true, 
-        paymentUrl: paymentResult.payment_url || paymentResult.checkout_url,
-        transactionId: paymentResult.id
+        success: true,
+        pixCode: paymentResult.qr_code,
+        pixCodeBase64: paymentResult.qr_code_base64,
+        transactionId: paymentResult.id,
+        status: paymentResult.status
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
