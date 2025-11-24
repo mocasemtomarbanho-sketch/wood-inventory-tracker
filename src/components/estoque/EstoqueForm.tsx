@@ -19,7 +19,6 @@ export function EstoqueForm({ onSuccess }: EstoqueFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [tipoMadeira, setTipoMadeira] = useState("");
   const [quantidadeMetros, setQuantidadeMetros] = useState("");
-  const [data, setData] = useState(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +41,7 @@ export function EstoqueForm({ onSuccess }: EstoqueFormProps) {
         .insert({
           tipo_madeira: tipoMadeira,
           quantidade_metros: parseFloat(quantidadeMetros),
-          data: data,
+          data: formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'),
           user_id: userData.user.id,
         });
 
@@ -55,7 +54,6 @@ export function EstoqueForm({ onSuccess }: EstoqueFormProps) {
 
       setTipoMadeira("");
       setQuantidadeMetros("");
-      setData(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
       onSuccess();
     } catch (error: any) {
       toast({
@@ -91,16 +89,6 @@ export function EstoqueForm({ onSuccess }: EstoqueFormProps) {
             placeholder="0.00"
             value={quantidadeMetros}
             onChange={(e) => setQuantidadeMetros(e.target.value)}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="data">Data</Label>
-          <Input
-            id="data"
-            type="date"
-            value={data}
-            onChange={(e) => setData(e.target.value)}
             required
           />
         </div>

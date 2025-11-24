@@ -20,7 +20,6 @@ export function CaminhoesForm({ onSuccess }: CaminhoesFormProps) {
   const [placa, setPlaca] = useState("");
   const [motorista, setMotorista] = useState("");
   const [tipoCarga, setTipoCarga] = useState("");
-  const [dataEntrada, setDataEntrada] = useState(formatInTimeZone(new Date(), 'America/Sao_Paulo', "yyyy-MM-dd'T'HH:mm"));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +43,7 @@ export function CaminhoesForm({ onSuccess }: CaminhoesFormProps) {
           placa: placa.toUpperCase(),
           motorista: motorista,
           tipo_carga: tipoCarga,
-          data_entrada: dataEntrada,
+          data_entrada: formatInTimeZone(new Date(), 'America/Sao_Paulo', "yyyy-MM-dd'T'HH:mm:ssXXX"),
           user_id: userData.user.id,
         });
 
@@ -58,7 +57,6 @@ export function CaminhoesForm({ onSuccess }: CaminhoesFormProps) {
       setPlaca("");
       setMotorista("");
       setTipoCarga("");
-      setDataEntrada(formatInTimeZone(new Date(), 'America/Sao_Paulo', "yyyy-MM-dd'T'HH:mm"));
       onSuccess();
     } catch (error: any) {
       toast({
@@ -102,16 +100,6 @@ export function CaminhoesForm({ onSuccess }: CaminhoesFormProps) {
             placeholder="Ex: Madeira, Paletes..."
             value={tipoCarga}
             onChange={(e) => setTipoCarga(e.target.value)}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="dataEntrada">Data e Hora de Entrada</Label>
-          <Input
-            id="dataEntrada"
-            type="datetime-local"
-            value={dataEntrada}
-            onChange={(e) => setDataEntrada(e.target.value)}
             required
           />
         </div>

@@ -85,7 +85,10 @@ export function EstoqueList({ refresh }: EstoqueListProps) {
             <div className="flex-1">
               <div className="font-semibold">{entrada.tipo_madeira}</div>
               <div className="text-sm text-muted-foreground">
-                {entrada.quantidade_metros} m³ • {new Date(entrada.data).toLocaleDateString('pt-BR')}
+                {entrada.quantidade_metros} m³
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Registrado em: {new Date(entrada.created_at).toLocaleDateString('pt-BR')}
               </div>
             </div>
             <Button

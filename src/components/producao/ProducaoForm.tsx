@@ -19,7 +19,6 @@ export function ProducaoForm({ onSuccess }: ProducaoFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [quantidade, setQuantidade] = useState("");
   const [metragemPalete, setMetragemPalete] = useState("");
-  const [data, setData] = useState(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +41,7 @@ export function ProducaoForm({ onSuccess }: ProducaoFormProps) {
         .insert({
           quantidade: parseInt(quantidade),
           metragem_palete: parseFloat(metragemPalete),
-          data: data,
+          data: formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'),
           user_id: userData.user.id,
         });
 
@@ -55,7 +54,6 @@ export function ProducaoForm({ onSuccess }: ProducaoFormProps) {
 
       setQuantidade("");
       setMetragemPalete("");
-      setData(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
       onSuccess();
     } catch (error: any) {
       toast({
@@ -92,16 +90,6 @@ export function ProducaoForm({ onSuccess }: ProducaoFormProps) {
             placeholder="0.00"
             value={metragemPalete}
             onChange={(e) => setMetragemPalete(e.target.value)}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="data">Data</Label>
-          <Input
-            id="data"
-            type="date"
-            value={data}
-            onChange={(e) => setData(e.target.value)}
             required
           />
         </div>

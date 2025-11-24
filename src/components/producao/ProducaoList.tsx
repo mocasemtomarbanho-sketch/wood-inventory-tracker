@@ -85,7 +85,10 @@ export function ProducaoList({ refresh }: ProducaoListProps) {
             <div className="flex-1">
               <div className="font-semibold">{producao.quantidade} Paletes</div>
               <div className="text-sm text-muted-foreground">
-                {producao.metragem_palete} m³/palete • {new Date(producao.data).toLocaleDateString('pt-BR')}
+                {producao.metragem_palete} m³/palete
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Registrado em: {new Date(producao.created_at).toLocaleDateString('pt-BR')}
               </div>
             </div>
             <Button
