@@ -46,6 +46,8 @@ serve(async (req) => {
     const transactionId = payload.id;
     const status = payload.status; // 'created', 'paid', 'expired', 'canceled'
 
+    console.log(`Processing webhook - Transaction ID: ${transactionId}, Status: ${status}`);
+
     if (!transactionId) {
       console.error('No transaction ID in webhook payload');
       return new Response(JSON.stringify({ error: 'Invalid payload' }), { 
@@ -59,9 +61,17 @@ serve(async (req) => {
       .from('subscriptions')
       .select('*')
       .ilike('punshipay_transaction_id', transactionId)
-      .single();
+      .maybeSingle();
 
-    if (fetchError || !subscriptions) {
+    if (fetchError) {
+      console.error('Error fetching subscription:', fetchError);
+      return new Response(JSON.stringify({ error: 'Database error' }), { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (!subscriptions) {
       console.error('Subscription not found for transaction:', transactionId);
       return new Response(JSON.stringify({ error: 'Subscription not found' }), { 
         status: 404,
@@ -75,6 +85,8 @@ serve(async (req) => {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 30);
 
+      console.log(`Activating subscription for user ${subscriptions.user_id}`);
+
       const { error: updateError } = await supabase
         .from('subscriptions')
         .update({
@@ -83,7 +95,7 @@ serve(async (req) => {
           expires_at: expiresAt.toISOString(),
           trial_ends_at: null // Remove o trial quando ativa a assinatura
         })
-        .eq('punshipay_transaction_id', transactionId);
+        .eq('id', subscriptions.id);
 
       if (updateError) {
         console.error('Error updating subscription:', updateError);

@@ -94,20 +94,46 @@ export default function Planos() {
     
     setLoading(true);
     try {
-      const { data: updatedSubscription } = await supabase
+      // Força refresh da subscription
+      await refreshAccess();
+      
+      // Aguarda um pouco para garantir que os dados foram atualizados
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const { data: updatedSubscription, error } = await supabase
         .from('subscriptions')
-        .select('status')
+        .select('status, expires_at, started_at')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (updatedSubscription?.status === 'active') {
-        toast.success("Pagamento confirmado! Redirecionando...");
+      if (error) {
+        console.error('Error checking subscription:', error);
+        toast.error("Erro ao verificar pagamento");
+        return;
+      }
+
+      if (!updatedSubscription) {
+        toast.error("Assinatura não encontrada");
+        return;
+      }
+
+      console.log('Subscription status:', updatedSubscription);
+
+      if (updatedSubscription.status === 'active' && updatedSubscription.expires_at) {
+        toast.success("✅ Pagamento confirmado! Seu plano está ativo. Redirecionando...");
         await refreshAccess();
-        setTimeout(() => navigate("/dashboard"), 1000);
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
+      } else if (updatedSubscription.status === 'pending') {
+        toast.error("⏳ Pagamento ainda não foi confirmado. Aguarde alguns instantes e tente novamente.");
+      } else if (updatedSubscription.status === 'trial') {
+        toast.error("Você ainda está no período de teste. Faça o pagamento para ativar seu plano.");
       } else {
-        toast.error("Pagamento ainda não foi confirmado. Aguarde alguns instantes.");
+        toast.error("Status da assinatura: " + updatedSubscription.status);
       }
     } catch (error) {
+      console.error('Error in handleCheckPayment:', error);
       toast.error("Erro ao verificar pagamento");
     } finally {
       setLoading(false);
