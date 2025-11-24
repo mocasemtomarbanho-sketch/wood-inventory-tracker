@@ -54,11 +54,11 @@ serve(async (req) => {
       });
     }
 
-    // Buscar assinatura pelo transaction_id
+    // Buscar assinatura pelo transaction_id (case-insensitive)
     const { data: subscriptions, error: fetchError } = await supabase
       .from('subscriptions')
       .select('*')
-      .eq('punshipay_transaction_id', transactionId)
+      .ilike('punshipay_transaction_id', transactionId)
       .single();
 
     if (fetchError || !subscriptions) {
