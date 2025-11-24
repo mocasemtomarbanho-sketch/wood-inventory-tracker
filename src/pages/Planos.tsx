@@ -35,6 +35,28 @@ export default function Planos() {
     }
   };
 
+  // Verificar status do pagamento periodicamente
+  useEffect(() => {
+    if (!pixData?.transactionId) return;
+
+    const checkPaymentStatus = setInterval(async () => {
+      const { data: updatedSubscription } = await supabase
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (updatedSubscription?.status === 'active') {
+        clearInterval(checkPaymentStatus);
+        toast.success("Pagamento confirmado! Redirecionando...");
+        await refreshAccess();
+        setTimeout(() => navigate("/dashboard"), 2000);
+      }
+    }, 3000); // Verificar a cada 3 segundos
+
+    return () => clearInterval(checkPaymentStatus);
+  }, [pixData, user, navigate, refreshAccess]);
+
   const handleSubscribe = async () => {
     if (!user) {
       toast.error("Você precisa estar logado para assinar");
@@ -74,7 +96,7 @@ export default function Planos() {
       <div className="container mx-auto px-4 py-20">
         <Button 
           variant="ghost" 
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/dashboard")}
           className="mb-8"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
