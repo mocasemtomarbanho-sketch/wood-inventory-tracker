@@ -32,16 +32,19 @@ export default function Auth() {
         setSession(session);
         setUser(session?.user ?? null);
         
-        if (session?.user) {
+        // Só redireciona se estiver logando (não em outras mudanças de estado)
+        if (event === 'SIGNED_IN' && session?.user) {
           navigate("/dashboard");
         }
       }
     );
 
+    // Verifica sessão inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
+      // Se já está logado, vai para dashboard
       if (session?.user) {
         navigate("/dashboard");
       }
