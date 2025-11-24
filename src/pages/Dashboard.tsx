@@ -59,42 +59,42 @@ const Dashboard = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-      
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="border-b bg-background sticky top-0 z-10">
-          <div className="flex items-center justify-between p-4">
-            <SidebarTrigger />
-            <Bell className="h-5 w-5 text-muted-foreground" />
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="flex-1 p-6 bg-gradient-to-b from-background to-muted/20">
-          <div className="max-w-7xl mx-auto space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold">Olá, {user.name || user.email}! 👋</h1>
-              <p className="text-muted-foreground">Visão geral do seu sistema de gestão</p>
+        
+        <div className="flex-1 flex flex-col">
+          {/* Header */}
+          <header className="border-b bg-background sticky top-0 z-10">
+            <div className="flex items-center justify-between p-4">
+              <SidebarTrigger />
+              <Bell className="h-5 w-5 text-muted-foreground" />
             </div>
+          </header>
 
-            {/* Cards de Estatísticas */}
-            <DashboardStats />
+          {/* Main Content */}
+          <main className="flex-1 p-6 bg-gradient-to-b from-background to-muted/20">
+            <div className="max-w-7xl mx-auto space-y-6">
+              <div>
+                <h1 className="text-3xl font-bold">Olá, {user.name || user.email}! 👋</h1>
+                <p className="text-muted-foreground">Visão geral do seu sistema de gestão</p>
+              </div>
 
-            {/* Gráficos e Dados Recentes */}
-            <div className="grid gap-6 md:grid-cols-2">
-              <RecentSales />
-              <RecentProduction />
+              {/* Cards de Estatísticas */}
+              <DashboardStats />
+
+              {/* Gráficos e Dados Recentes */}
+              <div className="grid gap-6 md:grid-cols-2">
+                <RecentSales />
+                <RecentProduction />
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <RecentStock />
+                <RecentTrucks />
+              </div>
             </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <RecentStock />
-              <RecentTrucks />
-            </div>
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
-    </div>
-  </SidebarProvider>
+    </SidebarProvider>
   );
 };
 
