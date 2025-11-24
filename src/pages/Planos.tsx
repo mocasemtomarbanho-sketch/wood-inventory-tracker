@@ -297,9 +297,9 @@ export default function Planos() {
             <div className="text-center mb-6">
               <h4 className="text-2xl font-bold mb-2">Plano Mensal</h4>
               <div className="text-4xl font-bold mb-2">
-                R$ 100<span className="text-lg text-muted-foreground">/mês</span>
+                R$ 100,00<span className="text-lg text-muted-foreground">/mês</span>
               </div>
-              <p className="text-muted-foreground">Renovação automática a cada 30 dias</p>
+              <p className="text-muted-foreground">Acesso completo por 30 dias após o pagamento</p>
             </div>
             <ul className="space-y-4 mb-8">
               <li className="flex items-center gap-3">
