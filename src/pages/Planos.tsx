@@ -15,18 +15,28 @@ export default function Planos() {
   const { subscription, isTrialActive, isSubscriptionActive, daysRemaining, refreshAccess } = useSubscriptionAccess();
 
   useEffect(() => {
+    // Verificar se está logado ao carregar a página
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session?.user) {
+        // Se não estiver logado, redireciona para login
+        navigate("/auth");
+        return;
+      }
       setUser(session?.user ?? null);
     });
 
     const { data: { subscription: authListener } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
+        if (!session?.user) {
+          // Se deslogou, vai para auth
+          navigate("/auth");
+        }
         setUser(session?.user ?? null);
       }
     );
 
     return () => authListener.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const copyPixCode = () => {
     if (pixData?.pixCode) {
