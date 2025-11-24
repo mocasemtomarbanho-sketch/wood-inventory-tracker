@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -94,14 +94,15 @@ export default function Planos() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       <div className="container mx-auto px-4 py-20">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate("/dashboard")}
-          className="mb-8"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar
-        </Button>
+        <Link to="/dashboard">
+          <Button 
+            variant="ghost" 
+            className="mb-8"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar
+          </Button>
+        </Link>
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 text-foreground">
