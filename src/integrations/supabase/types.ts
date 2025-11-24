@@ -14,7 +14,168 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      caminhoes_entradas: {
+        Row: {
+          created_at: string
+          data_entrada: string
+          id: string
+          motorista: string
+          placa: string
+          tipo_carga: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_entrada?: string
+          id?: string
+          motorista: string
+          placa: string
+          tipo_carga: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_entrada?: string
+          id?: string
+          motorista?: string
+          placa?: string
+          tipo_carga?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fornecedores: {
+        Row: {
+          cnpj_cpf: string | null
+          created_at: string
+          id: string
+          nome: string
+          observacoes: string | null
+          telefone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cnpj_cpf?: string | null
+          created_at?: string
+          id?: string
+          nome: string
+          observacoes?: string | null
+          telefone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cnpj_cpf?: string | null
+          created_at?: string
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      madeira_entradas: {
+        Row: {
+          created_at: string
+          data: string
+          id: string
+          quantidade_metros: number
+          tipo_madeira: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          id?: string
+          quantidade_metros: number
+          tipo_madeira: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          id?: string
+          quantidade_metros?: number
+          tipo_madeira?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      paletes_producao: {
+        Row: {
+          created_at: string
+          data: string
+          id: string
+          metragem_palete: number
+          quantidade: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          id?: string
+          metragem_palete: number
+          quantidade: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          id?: string
+          metragem_palete?: number
+          quantidade?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vendas: {
+        Row: {
+          cliente: string
+          created_at: string
+          data: string
+          id: string
+          produto: string
+          quantidade: number
+          updated_at: string
+          user_id: string
+          valor_total: number
+        }
+        Insert: {
+          cliente: string
+          created_at?: string
+          data: string
+          id?: string
+          produto: string
+          quantidade: number
+          updated_at?: string
+          user_id: string
+          valor_total: number
+        }
+        Update: {
+          cliente?: string
+          created_at?: string
+          data?: string
+          id?: string
+          produto?: string
+          quantidade?: number
+          updated_at?: string
+          user_id?: string
+          valor_total?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
