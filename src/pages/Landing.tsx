@@ -276,90 +276,132 @@ export default function Landing() {
       {/* Planos */}
       <section id="planos" className="container mx-auto px-4 py-20">
         <div className="text-center mb-12">
-          <h3 className="text-3xl font-bold mb-4 text-foreground">
-            Escolha Seu Plano
-          </h3>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+            Comece Grátis por 7 Dias
+          </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Plano mensal com acesso total às funcionalidades
+            Teste todas as funcionalidades sem compromisso. Depois escolha o plano ideal para seu negócio.
           </p>
         </div>
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-          {/* Plano Gratuito */}
-          <Card className="p-8 border-2">
-            <div className="text-center mb-6">
-              <h4 className="text-2xl font-bold mb-2">Teste Grátis</h4>
-              <div className="text-4xl font-bold mb-2">R$ 0</div>
-              <p className="text-muted-foreground">Experimente sem compromisso</p>
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+          {/* Plano Trial - 7 Dias Grátis */}
+          <Card className="p-8 border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10 relative overflow-hidden">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+              <span className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">
+                🎉 Comece Agora
+              </span>
+            </div>
+            <div className="text-center mb-6 mt-4">
+              <h4 className="text-3xl font-bold mb-3 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                7 Dias Grátis
+              </h4>
+              <div className="text-5xl font-bold mb-3 text-foreground">R$ 0</div>
+              <p className="text-muted-foreground font-medium">Teste completo sem cartão de crédito</p>
             </div>
             <ul className="space-y-4 mb-8">
               <li className="flex items-center gap-3">
-                <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Acesso limitado por 7 dias</span>
+                <div className="bg-primary/20 rounded-full p-1">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                </div>
+                <span className="font-medium">7 dias de acesso total</span>
               </li>
               <li className="flex items-center gap-3">
-                <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Todas as funcionalidades</span>
+                <div className="bg-primary/20 rounded-full p-1">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                </div>
+                <span className="font-medium">Todas as funcionalidades liberadas</span>
               </li>
               <li className="flex items-center gap-3">
-                <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Suporte básico</span>
+                <div className="bg-primary/20 rounded-full p-1">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                </div>
+                <span className="font-medium">Gestão completa de estoque</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="bg-primary/20 rounded-full p-1">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                </div>
+                <span className="font-medium">Controle de produção e vendas</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="bg-primary/20 rounded-full p-1">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                </div>
+                <span className="font-medium">Relatórios e dashboards</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="bg-primary/20 rounded-full p-1">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                </div>
+                <span className="font-medium">Seus dados salvos e seguros</span>
               </li>
             </ul>
             <Button 
-              variant="outline" 
-              className="w-full"
+              size="lg"
+              className="w-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
               onClick={() => navigate("/auth")}
             >
-              Começar Grátis
+              Começar Teste Grátis
             </Button>
+            <p className="text-xs text-center text-muted-foreground mt-4">
+              Não é necessário cartão de crédito
+            </p>
           </Card>
 
           {/* Plano Mensal */}
-          <Card className="p-8 border-2 border-primary relative">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
-                Recomendado
-              </span>
-            </div>
+          <Card className="p-8 border-2 relative">
             <div className="text-center mb-6">
-              <h4 className="text-2xl font-bold mb-2">Plano Mensal</h4>
-              <div className="text-4xl font-bold mb-2">
-                R$ 100<span className="text-lg text-muted-foreground">/mês</span>
+              <h4 className="text-3xl font-bold mb-3 text-foreground">Plano Mensal</h4>
+              <div className="text-5xl font-bold mb-3 text-primary">
+                R$ 100<span className="text-xl text-muted-foreground font-normal">/mês</span>
               </div>
-              <p className="text-muted-foreground">Acesso completo e ilimitado</p>
+              <p className="text-muted-foreground font-medium">Acesso ilimitado após o período de teste</p>
             </div>
             <ul className="space-y-4 mb-8">
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Acesso ilimitado</span>
+                <span className="font-medium">Acesso ilimitado permanente</span>
               </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Todas as funcionalidades</span>
+                <span className="font-medium">Todas as funcionalidades</span>
               </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Registros ilimitados</span>
+                <span className="font-medium">Registros ilimitados</span>
               </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Relatórios em PDF</span>
+                <span className="font-medium">Relatórios em PDF profissionais</span>
               </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Suporte prioritário</span>
+                <span className="font-medium">Suporte prioritário via WhatsApp</span>
               </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Atualizações gratuitas</span>
+                <span className="font-medium">Atualizações e melhorias gratuitas</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="font-medium">Backup automático diário</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="font-medium">Segurança avançada</span>
               </li>
             </ul>
             <Button 
-              className="w-full"
+              variant="outline"
+              size="lg"
+              className="w-full text-lg font-semibold border-2"
               onClick={() => navigate("/planos")}
             >
-              Assinar Agora
+              Ver Detalhes
             </Button>
+            <p className="text-xs text-center text-muted-foreground mt-4">
+              Cancele quando quiser, sem multa
+            </p>
           </Card>
         </div>
       </section>

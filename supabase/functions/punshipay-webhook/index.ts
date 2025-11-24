@@ -47,14 +47,15 @@ serve(async (req) => {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 30);
 
-      // Atualizar assinatura para ativa
+      // Atualizar assinatura para ativa (remove trial)
       const { error: updateError } = await supabase
         .from('subscriptions')
         .update({
           status: 'active',
           started_at: new Date().toISOString(),
           expires_at: expiresAt.toISOString(),
-          punshipay_transaction_id: transactionId
+          punshipay_transaction_id: transactionId,
+          trial_ends_at: null // Limpa o trial quando ativa a assinatura
         })
         .eq('user_id', metadata.user_id);
 
@@ -63,18 +64,21 @@ serve(async (req) => {
         throw updateError;
       }
 
-      console.log(`Subscription activated for user ${metadata.user_id}`);
+      console.log(`Subscription activated for user ${metadata.user_id}, trial removed`);
     } else if (event === 'payment.failed' || event === 'payment.cancelled') {
       const metadata = data.metadata;
       
       if (metadata?.user_id) {
-        // Marcar assinatura como inativa
+        // Marcar assinatura como inativa (não mexe no trial)
         await supabase
           .from('subscriptions')
-          .update({ status: 'cancelled' })
+          .update({ 
+            status: 'inactive',
+            punshipay_transaction_id: null
+          })
           .eq('user_id', metadata.user_id);
 
-        console.log(`Subscription cancelled for user ${metadata.user_id}`);
+        console.log(`Payment failed/cancelled for user ${metadata.user_id}`);
       }
     }
 

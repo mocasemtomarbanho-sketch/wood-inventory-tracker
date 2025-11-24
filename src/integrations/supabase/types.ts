@@ -150,6 +150,7 @@ export type Database = {
           punshipay_transaction_id: string | null
           started_at: string | null
           status: string
+          trial_ends_at: string | null
           updated_at: string
           user_id: string
         }
@@ -162,6 +163,7 @@ export type Database = {
           punshipay_transaction_id?: string | null
           started_at?: string | null
           status?: string
+          trial_ends_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -174,6 +176,7 @@ export type Database = {
           punshipay_transaction_id?: string | null
           started_at?: string | null
           status?: string
+          trial_ends_at?: string | null
           updated_at?: string
           user_id?: string
         }
