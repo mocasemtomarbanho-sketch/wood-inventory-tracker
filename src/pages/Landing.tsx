@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { BarChart3, Shield, Truck, FileText, Package, TrendingUp, Clock, CheckCircle2, Menu, X } from "lucide-react";
+import { BarChart3, Shield, Truck, FileText, Package, TrendingUp, Clock, CheckCircle2, Menu, X, Check } from "lucide-react";
 import { useState } from "react";
 
 export default function Landing() {
@@ -32,6 +32,9 @@ export default function Landing() {
               </button>
               <button onClick={() => scrollToSection('sobre')} className="text-sm font-medium hover:text-primary transition-colors">
                 Sobre
+              </button>
+              <button onClick={() => scrollToSection('planos')} className="text-sm font-medium hover:text-primary transition-colors">
+                Planos
               </button>
               <button onClick={() => scrollToSection('recursos')} className="text-sm font-medium hover:text-primary transition-colors">
                 Recursos
@@ -72,6 +75,12 @@ export default function Landing() {
                 className="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
               >
                 Sobre
+              </button>
+              <button 
+                onClick={() => scrollToSection('planos')} 
+                className="block w-full text-left px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+              >
+                Planos
               </button>
               <button 
                 onClick={() => scrollToSection('recursos')} 
@@ -260,6 +269,97 @@ export default function Landing() {
             <p className="text-muted-foreground">
               Analise períodos específicos com filtros flexíveis e visualize estatísticas em tempo real.
             </p>
+          </Card>
+        </div>
+      </section>
+
+      {/* Planos */}
+      <section id="planos" className="container mx-auto px-4 py-20">
+        <div className="text-center mb-12">
+          <h3 className="text-3xl font-bold mb-4 text-foreground">
+            Escolha Seu Plano
+          </h3>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Plano mensal com acesso total às funcionalidades
+          </p>
+        </div>
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+          {/* Plano Gratuito */}
+          <Card className="p-8 border-2">
+            <div className="text-center mb-6">
+              <h4 className="text-2xl font-bold mb-2">Teste Grátis</h4>
+              <div className="text-4xl font-bold mb-2">R$ 0</div>
+              <p className="text-muted-foreground">Experimente sem compromisso</p>
+            </div>
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span>Acesso limitado por 7 dias</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span>Todas as funcionalidades</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span>Suporte básico</span>
+              </li>
+            </ul>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => navigate("/auth")}
+            >
+              Começar Grátis
+            </Button>
+          </Card>
+
+          {/* Plano Mensal */}
+          <Card className="p-8 border-2 border-primary relative">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+              <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
+                Recomendado
+              </span>
+            </div>
+            <div className="text-center mb-6">
+              <h4 className="text-2xl font-bold mb-2">Plano Mensal</h4>
+              <div className="text-4xl font-bold mb-2">
+                R$ 100<span className="text-lg text-muted-foreground">/mês</span>
+              </div>
+              <p className="text-muted-foreground">Acesso completo e ilimitado</p>
+            </div>
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span>Acesso ilimitado</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span>Todas as funcionalidades</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span>Registros ilimitados</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span>Relatórios em PDF</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span>Suporte prioritário</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span>Atualizações gratuitas</span>
+              </li>
+            </ul>
+            <Button 
+              className="w-full"
+              onClick={() => navigate("/planos")}
+            >
+              Assinar Agora
+            </Button>
           </Card>
         </div>
       </section>
