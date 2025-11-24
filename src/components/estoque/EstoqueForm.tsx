@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { formatInTimeZone } from 'date-fns-tz';
 
 interface EstoqueFormProps {
   onSuccess: () => void;
@@ -15,7 +16,7 @@ export function EstoqueForm({ onSuccess }: EstoqueFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [tipoMadeira, setTipoMadeira] = useState("");
   const [quantidadeMetros, setQuantidadeMetros] = useState("");
-  const [data, setData] = useState(new Date().toISOString().split('T')[0]);
+  const [data, setData] = useState(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +52,7 @@ export function EstoqueForm({ onSuccess }: EstoqueFormProps) {
 
       setTipoMadeira("");
       setQuantidadeMetros("");
-      setData(new Date().toISOString().split('T')[0]);
+      setData(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
       onSuccess();
     } catch (error: any) {
       toast({

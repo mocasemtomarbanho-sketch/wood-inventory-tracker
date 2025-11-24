@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { formatInTimeZone } from 'date-fns-tz';
 
 interface ProducaoFormProps {
   onSuccess: () => void;
@@ -15,7 +16,7 @@ export function ProducaoForm({ onSuccess }: ProducaoFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [quantidade, setQuantidade] = useState("");
   const [metragemPalete, setMetragemPalete] = useState("");
-  const [data, setData] = useState(new Date().toISOString().split('T')[0]);
+  const [data, setData] = useState(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +52,7 @@ export function ProducaoForm({ onSuccess }: ProducaoFormProps) {
 
       setQuantidade("");
       setMetragemPalete("");
-      setData(new Date().toISOString().split('T')[0]);
+      setData(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
       onSuccess();
     } catch (error: any) {
       toast({
