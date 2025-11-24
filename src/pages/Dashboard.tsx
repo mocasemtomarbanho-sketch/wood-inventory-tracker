@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Bell, TrendingUp, Package2, AlertCircle, ShoppingCart } from "lucide-react";
+import { SubscriptionGuard } from "@/components/SubscriptionGuard";
+import { supabase } from "@/integrations/supabase/client";
 
 interface User {
   email: string;
@@ -15,12 +17,25 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) {
-      navigate("/auth");
-    } else {
-      setUser(JSON.parse(storedUser));
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session?.user) {
+        navigate("/auth");
+      } else {
+        setUser({ email: session.user.email || '', name: session.user.user_metadata?.name });
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!session?.user) {
+          navigate("/auth");
+        } else {
+          setUser({ email: session.user.email || '', name: session.user.user_metadata?.name });
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   if (!user) {
@@ -28,9 +43,10 @@ const Dashboard = () => {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AppSidebar />
+    <SubscriptionGuard>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
         
         <div className="flex-1 flex flex-col">
           {/* Header */}
@@ -168,6 +184,7 @@ const Dashboard = () => {
         </div>
       </div>
     </SidebarProvider>
+    </SubscriptionGuard>
   );
 };
 

@@ -4,45 +4,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Check, Loader2, ArrowLeft } from "lucide-react";
+import { Check, Loader2, ArrowLeft, Clock, CreditCard } from "lucide-react";
+import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 
 export default function Planos() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [subscription, setSubscription] = useState<any>(null);
+  const { subscription, isTrialActive, isSubscriptionActive, daysRemaining, refreshAccess } = useSubscriptionAccess();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        loadSubscription(session.user.id);
-      }
     });
 
     const { data: { subscription: authListener } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null);
-        if (session?.user) {
-          loadSubscription(session.user.id);
-        }
       }
     );
 
     return () => authListener.unsubscribe();
   }, []);
-
-  const loadSubscription = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (!error && data) {
-      setSubscription(data);
-    }
-  };
 
   const handleSubscribe = async () => {
     if (!user) {
@@ -76,9 +59,7 @@ export default function Planos() {
     }
   };
 
-  const hasActiveSubscription = subscription?.status === 'active' && 
-    subscription?.expires_at && 
-    new Date(subscription.expires_at) > new Date();
+  const hasActiveSubscription = isSubscriptionActive;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
@@ -94,57 +75,81 @@ export default function Planos() {
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 text-foreground">
-            Escolha Seu Plano
+            {isTrialActive ? 'Seu Período de Teste' : 'Escolha Seu Plano'}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Comece gratuitamente ou assine para acesso completo
+            {isTrialActive 
+              ? `Você tem ${daysRemaining} ${daysRemaining === 1 ? 'dia' : 'dias'} restantes no seu período de teste gratuito`
+              : 'Comece com 7 dias grátis ou assine para acesso ilimitado'
+            }
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-          {/* Plano Gratuito */}
-          <Card className="p-8 border-2">
-            <div className="text-center mb-6">
-              <h4 className="text-2xl font-bold mb-2">Teste Grátis</h4>
-              <div className="text-4xl font-bold mb-2">R$ 0</div>
-              <p className="text-muted-foreground">Experimente sem compromisso</p>
+        {isTrialActive && (
+          <Card className="max-w-2xl mx-auto mb-8 p-6 bg-primary/5 border-primary/20">
+            <div className="flex items-start gap-4">
+              <Clock className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold mb-2">Período de Teste Ativo</h3>
+                <p className="text-muted-foreground mb-4">
+                  Você está aproveitando nosso período de teste gratuito de 7 dias com acesso total a todas as funcionalidades.
+                  Seus dados estão sendo salvos e continuarão disponíveis após a assinatura.
+                </p>
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span className="font-medium">
+                    Restam {daysRemaining} {daysRemaining === 1 ? 'dia' : 'dias'} de teste grátis
+                  </span>
+                </div>
+              </div>
             </div>
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-center gap-3">
-                <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Acesso limitado por 7 dias</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Todas as funcionalidades</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                <span>Suporte básico</span>
-              </li>
-            </ul>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => navigate("/auth")}
-            >
-              Começar Grátis
-            </Button>
           </Card>
+        )}
+
+        <div className="max-w-4xl mx-auto grid md:grid-cols-1 gap-8">
+          {!user && (
+            <Card className="p-8 border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10">
+              <div className="text-center mb-6">
+                <h4 className="text-2xl font-bold mb-2">7 Dias Grátis</h4>
+                <div className="text-4xl font-bold mb-2">R$ 0</div>
+                <p className="text-muted-foreground">Teste completo sem cartão de crédito</p>
+              </div>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>7 dias de acesso total</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Todas as funcionalidades liberadas</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Seus dados salvos e seguros</span>
+                </li>
+              </ul>
+              <Button 
+                className="w-full"
+                onClick={() => navigate("/auth")}
+              >
+                Começar Teste Grátis
+              </Button>
+            </Card>
+          )}
 
           {/* Plano Mensal */}
-          <Card className={`p-8 border-2 relative ${hasActiveSubscription ? 'border-green-500' : 'border-primary'}`}>
+          <Card className={`p-8 border-2 relative ${hasActiveSubscription ? 'border-green-500' : isTrialActive ? 'border-primary' : 'border-border'}`}>
             {hasActiveSubscription && (
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                  Assinatura Ativa
+                  ✓ Assinatura Ativa
                 </span>
               </div>
             )}
-            {!hasActiveSubscription && (
+            {!hasActiveSubscription && isTrialActive && (
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
-                  Recomendado
+                  🔥 Assine Agora
                 </span>
               </div>
             )}
@@ -195,19 +200,47 @@ export default function Planos() {
                   </p>
                 )}
               </div>
+            ) : isTrialActive ? (
+              <div className="space-y-4">
+                <Button 
+                  className="w-full"
+                  onClick={handleSubscribe}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Assinar com PIX
+                    </>
+                  )}
+                </Button>
+                <p className="text-sm text-center text-muted-foreground">
+                  Após o período de teste, suas funcionalidades serão pausadas até a assinatura
+                </p>
+              </div>
             ) : (
               <Button 
                 className="w-full"
                 onClick={handleSubscribe}
-                disabled={loading}
+                disabled={loading || !user}
               >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Processando...
                   </>
+                ) : !user ? (
+                  'Faça login para assinar'
                 ) : (
-                  'Assinar Agora'
+                  <>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Assinar com PIX
+                  </>
                 )}
               </Button>
             )}
@@ -216,10 +249,26 @@ export default function Planos() {
 
         {hasActiveSubscription && (
           <div className="text-center mt-8">
-            <Card className="p-6 max-w-2xl mx-auto">
-              <h3 className="text-xl font-semibold mb-2">✓ Você está com acesso completo!</h3>
+            <Card className="p-6 max-w-2xl mx-auto bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
+              <h3 className="text-xl font-semibold mb-2 text-green-700 dark:text-green-300">
+                ✓ Você está com acesso completo!
+              </h3>
               <p className="text-muted-foreground">
                 Aproveite todos os recursos ilimitados da plataforma
+              </p>
+            </Card>
+          </div>
+        )}
+
+        {!isTrialActive && !hasActiveSubscription && user && (
+          <div className="text-center mt-8">
+            <Card className="p-6 max-w-2xl mx-auto bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800">
+              <h3 className="text-xl font-semibold mb-2 text-orange-700 dark:text-orange-300">
+                ⚠️ Período de teste expirado
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Seu período de 7 dias gratuitos terminou. Seus dados estão salvos e seguros.
+                Assine agora para continuar usando o sistema com todas as funcionalidades.
               </p>
             </Card>
           </div>

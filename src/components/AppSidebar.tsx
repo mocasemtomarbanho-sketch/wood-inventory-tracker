@@ -8,7 +8,8 @@ import {
   FileText, 
   Settings,
   LogOut,
-  TreePine
+  TreePine,
+  CreditCard
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +37,7 @@ const menuItems = [
   { title: "Notificações", url: "/notificacoes", icon: Bell },
   { title: "Relatórios", url: "/relatorios", icon: FileText },
   { title: "Administração", url: "/administracao", icon: Settings },
+  { title: "Planos", url: "/planos", icon: CreditCard },
 ];
 
 export function AppSidebar() {
