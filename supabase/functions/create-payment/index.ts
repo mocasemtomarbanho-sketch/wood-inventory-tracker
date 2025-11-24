@@ -27,8 +27,8 @@ serve(async (req) => {
       throw new Error('Pushinpay token not configured');
     }
 
-    // Valor de teste (R$ 1,00 em centavos)
-    const amount = 100;
+    // Valor de teste (R$ 0,50 em centavos)
+    const amount = 50;
 
     // Criar ou atualizar assinatura com status pending
     const { error: subscriptionError } = await supabase

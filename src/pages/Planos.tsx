@@ -89,6 +89,31 @@ export default function Planos() {
     }
   };
 
+  const handleCheckPayment = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const { data: updatedSubscription } = await supabase
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', user.id)
+        .single();
+
+      if (updatedSubscription?.status === 'active') {
+        toast.success("Pagamento confirmado! Redirecionando...");
+        await refreshAccess();
+        setTimeout(() => navigate("/dashboard"), 1000);
+      } else {
+        toast.error("Pagamento ainda não foi confirmado. Aguarde alguns instantes.");
+      }
+    } catch (error) {
+      toast.error("Erro ao verificar pagamento");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const hasActiveSubscription = isSubscriptionActive;
 
   return (
@@ -171,6 +196,21 @@ export default function Planos() {
                 </Button>
               </div>
 
+              <Button 
+                onClick={handleCheckPayment}
+                disabled={loading}
+                className="w-full mb-4"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verificando...
+                  </>
+                ) : (
+                  "Verificar Pagamento"
+                )}
+              </Button>
+
               <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
                 <p className="text-sm text-blue-700 dark:text-blue-300">
                   ℹ️ Após o pagamento, sua assinatura será ativada automaticamente em poucos segundos.
@@ -229,11 +269,11 @@ export default function Planos() {
               </div>
             )}
             <div className="text-center mb-6">
-              <h4 className="text-2xl font-bold mb-2">Plano Mensal</h4>
+              <h4 className="text-2xl font-bold mb-2">Plano Mensal (TESTE)</h4>
               <div className="text-4xl font-bold mb-2">
-                R$ 100<span className="text-lg text-muted-foreground">/mês</span>
+                R$ 0,50<span className="text-lg text-muted-foreground">/teste</span>
               </div>
-              <p className="text-muted-foreground">Acesso completo e ilimitado</p>
+              <p className="text-muted-foreground">Teste de pagamento PIX</p>
             </div>
             <ul className="space-y-4 mb-8">
               <li className="flex items-center gap-3">
