@@ -240,7 +240,7 @@ export default function Planos() {
               <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
                 <p className="text-sm text-blue-700 dark:text-blue-300">
                   ℹ️ Após o pagamento, sua assinatura será ativada automaticamente em poucos segundos.
-                  Você receberá acesso completo por 30 dias.
+                  Você receberá acesso completo por 30 dias. Após esse período, será necessário renovar o plano.
                 </p>
               </div>
             </div>
@@ -295,11 +295,11 @@ export default function Planos() {
               </div>
             )}
             <div className="text-center mb-6">
-              <h4 className="text-2xl font-bold mb-2">Plano Mensal (TESTE)</h4>
+              <h4 className="text-2xl font-bold mb-2">Plano Mensal</h4>
               <div className="text-4xl font-bold mb-2">
-                R$ 0,50<span className="text-lg text-muted-foreground">/teste</span>
+                R$ 100<span className="text-lg text-muted-foreground">/mês</span>
               </div>
-              <p className="text-muted-foreground">Teste de pagamento PIX</p>
+              <p className="text-muted-foreground">Renovação automática a cada 30 dias</p>
             </div>
             <ul className="space-y-4 mb-8">
               <li className="flex items-center gap-3">

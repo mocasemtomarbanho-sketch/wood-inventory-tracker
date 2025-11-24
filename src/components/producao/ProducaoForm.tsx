@@ -15,7 +15,7 @@ interface ProducaoFormProps {
 
 export function ProducaoForm({ onSuccess }: ProducaoFormProps) {
   const { toast } = useToast();
-  const { hasAccess } = useSubscriptionAccess();
+  const { hasAccess, redirectToPlans } = useSubscriptionAccess();
   const [isLoading, setIsLoading] = useState(false);
   const [quantidade, setQuantidade] = useState("");
   const [metragemPalete, setMetragemPalete] = useState("");
@@ -93,18 +93,21 @@ export function ProducaoForm({ onSuccess }: ProducaoFormProps) {
             required
           />
         </div>
-        <Button type="submit" className="w-full" disabled={isLoading || !hasAccess}>
-          {!hasAccess ? (
-            <>
-              <Lock className="mr-2 h-4 w-4" />
-              Assinatura Necessária
-            </>
-          ) : isLoading ? (
-            "Salvando..."
-          ) : (
-            "Registrar Produção"
-          )}
-        </Button>
+        {!hasAccess ? (
+          <Button 
+            type="button" 
+            className="w-full" 
+            onClick={redirectToPlans}
+            variant="default"
+          >
+            <Lock className="mr-2 h-4 w-4" />
+            Renovar Plano para Continuar
+          </Button>
+        ) : (
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Salvando..." : "Registrar Produção"}
+          </Button>
+        )}
       </form>
     </Card>
   );

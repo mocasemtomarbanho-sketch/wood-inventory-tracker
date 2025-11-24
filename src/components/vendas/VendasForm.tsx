@@ -15,7 +15,7 @@ interface VendasFormProps {
 
 export function VendasForm({ onSuccess }: VendasFormProps) {
   const { toast } = useToast();
-  const { hasAccess } = useSubscriptionAccess();
+  const { hasAccess, redirectToPlans } = useSubscriptionAccess();
   const [isLoading, setIsLoading] = useState(false);
   const [cliente, setCliente] = useState("");
   const [produto, setProduto] = useState("");
@@ -128,18 +128,21 @@ export function VendasForm({ onSuccess }: VendasFormProps) {
             required
           />
         </div>
-        <Button type="submit" className="w-full" disabled={isLoading || !hasAccess}>
-          {!hasAccess ? (
-            <>
-              <Lock className="mr-2 h-4 w-4" />
-              Assinatura Necessária
-            </>
-          ) : isLoading ? (
-            "Salvando..."
-          ) : (
-            "Registrar Venda"
-          )}
-        </Button>
+        {!hasAccess ? (
+          <Button 
+            type="button" 
+            className="w-full" 
+            onClick={redirectToPlans}
+            variant="default"
+          >
+            <Lock className="mr-2 h-4 w-4" />
+            Renovar Plano para Continuar
+          </Button>
+        ) : (
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Salvando..." : "Registrar Venda"}
+          </Button>
+        )}
       </form>
     </Card>
   );
