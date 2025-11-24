@@ -2,8 +2,10 @@ import { ReactNode } from 'react';
 import { useSubscriptionAccess } from '@/hooks/useSubscriptionAccess';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Lock, CreditCard } from 'lucide-react';
+import { Lock, CreditCard, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface SubscriptionGuardProps {
   children: ReactNode;
@@ -12,6 +14,16 @@ interface SubscriptionGuardProps {
 export const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
   const { hasAccess, isLoading, isTrialActive, daysRemaining } = useSubscriptionAccess();
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error('Erro ao fazer logout');
+    } else {
+      toast.success('Logout realizado com sucesso');
+      navigate('/auth');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -49,9 +61,10 @@ export const SubscriptionGuard = ({ children }: SubscriptionGuardProps) => {
               variant="outline" 
               size="lg" 
               className="w-full"
-              onClick={() => navigate('/')}
+              onClick={handleLogout}
             >
-              Voltar para Home
+              <LogOut className="mr-2 h-5 w-5" />
+              Fazer Login com Outra Conta
             </Button>
           </div>
 
