@@ -33,9 +33,7 @@ export default function Auth() {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          setTimeout(() => {
-            navigate("/dashboard");
-          }, 0);
+          navigate("/dashboard");
         }
       }
     );
