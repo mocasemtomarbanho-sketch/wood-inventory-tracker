@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Bell, TrendingUp, Package2, AlertCircle, ShoppingCart } from "lucide-react";
+import { Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { DashboardStats } from "@/components/dashboard/DashboardStats";
+import { RecentSales } from "@/components/dashboard/RecentSales";
+import { RecentProduction } from "@/components/dashboard/RecentProduction";
+import { RecentStock } from "@/components/dashboard/RecentStock";
+import { RecentTrucks } from "@/components/dashboard/RecentTrucks";
 
 interface User {
   email: string;
@@ -57,7 +61,26 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <main className="flex-1 p-6 bg-gradient-to-b from-background to-muted/20">
-...
+          <div className="max-w-7xl mx-auto space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold">Olá, {user.name || user.email}! 👋</h1>
+              <p className="text-muted-foreground">Visão geral do seu sistema de gestão</p>
+            </div>
+
+            {/* Cards de Estatísticas */}
+            <DashboardStats />
+
+            {/* Gráficos e Dados Recentes */}
+            <div className="grid gap-6 md:grid-cols-2">
+              <RecentSales />
+              <RecentProduction />
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              <RecentStock />
+              <RecentTrucks />
+            </div>
+          </div>
         </main>
       </div>
     </div>
