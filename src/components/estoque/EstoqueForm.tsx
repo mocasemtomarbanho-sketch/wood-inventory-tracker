@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { formatInTimeZone } from 'date-fns-tz';
+import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
+import { Lock } from "lucide-react";
 
 interface EstoqueFormProps {
   onSuccess: () => void;
@@ -13,6 +15,7 @@ interface EstoqueFormProps {
 
 export function EstoqueForm({ onSuccess }: EstoqueFormProps) {
   const { toast } = useToast();
+  const { hasAccess } = useSubscriptionAccess();
   const [isLoading, setIsLoading] = useState(false);
   const [tipoMadeira, setTipoMadeira] = useState("");
   const [quantidadeMetros, setQuantidadeMetros] = useState("");
@@ -101,8 +104,17 @@ export function EstoqueForm({ onSuccess }: EstoqueFormProps) {
             required
           />
         </div>
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Salvando..." : "Registrar Entrada"}
+        <Button type="submit" className="w-full" disabled={isLoading || !hasAccess}>
+          {!hasAccess ? (
+            <>
+              <Lock className="mr-2 h-4 w-4" />
+              Assinatura Necessária
+            </>
+          ) : isLoading ? (
+            "Salvando..."
+          ) : (
+            "Registrar Entrada"
+          )}
         </Button>
       </form>
     </Card>
