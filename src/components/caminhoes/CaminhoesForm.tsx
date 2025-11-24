@@ -1,0 +1,120 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+interface CaminhoesFormProps {
+  onSuccess: () => void;
+}
+
+export function CaminhoesForm({ onSuccess }: CaminhoesFormProps) {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [placa, setPlaca] = useState("");
+  const [motorista, setMotorista] = useState("");
+  const [tipoCarga, setTipoCarga] = useState("");
+  const [dataEntrada, setDataEntrada] = useState(new Date().toISOString().slice(0, 16));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      
+      if (!userData.user) {
+        toast({
+          title: "Erro",
+          description: "Você precisa estar logado.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from("caminhoes_entradas")
+        .insert({
+          placa: placa.toUpperCase(),
+          motorista: motorista,
+          tipo_carga: tipoCarga,
+          data_entrada: dataEntrada,
+          user_id: userData.user.id,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso!",
+        description: "Entrada de caminhão registrada.",
+      });
+
+      setPlaca("");
+      setMotorista("");
+      setTipoCarga("");
+      setDataEntrada(new Date().toISOString().slice(0, 16));
+      onSuccess();
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Card className="p-6">
+      <h2 className="text-xl font-bold mb-4">Registrar Entrada de Caminhão</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="placa">Placa</Label>
+          <Input
+            id="placa"
+            placeholder="ABC-1234"
+            value={placa}
+            onChange={(e) => setPlaca(e.target.value)}
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="motorista">Motorista</Label>
+          <Input
+            id="motorista"
+            placeholder="Nome do motorista"
+            value={motorista}
+            onChange={(e) => setMotorista(e.target.value)}
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="tipoCarga">Tipo de Carga</Label>
+          <Input
+            id="tipoCarga"
+            placeholder="Ex: Madeira, Paletes..."
+            value={tipoCarga}
+            onChange={(e) => setTipoCarga(e.target.value)}
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="dataEntrada">Data e Hora de Entrada</Label>
+          <Input
+            id="dataEntrada"
+            type="datetime-local"
+            value={dataEntrada}
+            onChange={(e) => setDataEntrada(e.target.value)}
+            required
+          />
+        </div>
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Salvando..." : "Registrar Entrada"}
+        </Button>
+      </form>
+    </Card>
+  );
+}

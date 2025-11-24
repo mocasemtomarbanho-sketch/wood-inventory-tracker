@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,15 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Truck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Session, User } from "@supabase/supabase-js";
 
 export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   // Login state
   const [loginEmail, setLoginEmail] = useState("");
@@ -22,54 +26,104 @@ export default function Auth() {
   const [signupPassword, setSignupPassword] = useState("");
   const [signupName, setSignupName] = useState("");
 
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 0);
+        }
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        navigate("/dashboard");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // TODO: Implement real auth when Cloud is enabled
-    // For now, mock authentication
-    setTimeout(() => {
-      if (loginEmail && loginPassword) {
-        localStorage.setItem("user", JSON.stringify({ email: loginEmail }));
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password: loginPassword,
+      });
+
+      if (error) {
+        toast({
+          title: "Erro ao fazer login",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else if (data.user) {
         toast({
           title: "Login realizado!",
           description: "Bem-vindo de volta.",
         });
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Erro",
-          description: "Por favor, preencha todos os campos.",
-          variant: "destructive",
-        });
       }
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Ocorreu um erro ao fazer login.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // TODO: Implement real auth when Cloud is enabled
-    // For now, mock authentication
-    setTimeout(() => {
-      if (signupEmail && signupPassword && signupName) {
-        localStorage.setItem("user", JSON.stringify({ email: signupEmail, name: signupName }));
+    try {
+      const redirectUrl = `${window.location.origin}/dashboard`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: signupEmail,
+        password: signupPassword,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            name: signupName,
+          }
+        }
+      });
+
+      if (error) {
         toast({
-          title: "Conta criada!",
-          description: "Sua conta foi criada com sucesso.",
-        });
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Erro",
-          description: "Por favor, preencha todos os campos.",
+          title: "Erro ao criar conta",
+          description: error.message,
           variant: "destructive",
         });
+      } else if (data.user) {
+        toast({
+          title: "Conta criada!",
+          description: "Sua conta foi criada com sucesso. Você já está logado!",
+        });
       }
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Ocorreu um erro ao criar a conta.",
+        variant: "destructive",
+        });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -114,9 +168,6 @@ export default function Auth() {
                 {isLoading ? "Entrando..." : "Entrar"}
               </Button>
             </form>
-            <p className="text-sm text-muted-foreground mt-4 text-center">
-              Habilite o Lovable Cloud para autenticação real
-            </p>
           </TabsContent>
 
           <TabsContent value="signup">
@@ -158,9 +209,6 @@ export default function Auth() {
                 {isLoading ? "Criando conta..." : "Criar Conta"}
               </Button>
             </form>
-            <p className="text-sm text-muted-foreground mt-4 text-center">
-              Habilite o Lovable Cloud para autenticação real
-            </p>
           </TabsContent>
         </Tabs>
 
