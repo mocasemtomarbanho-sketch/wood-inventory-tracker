@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Check, Loader2, ArrowLeft, Clock, CreditCard } from "lucide-react";
+import { Check, Loader2, ArrowLeft, Clock, CreditCard, Copy, QrCode } from "lucide-react";
 import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 
 export default function Planos() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [pixData, setPixData] = useState<any>(null);
   const { subscription, isTrialActive, isSubscriptionActive, daysRemaining, refreshAccess } = useSubscriptionAccess();
 
   useEffect(() => {
@@ -26,6 +27,13 @@ export default function Planos() {
 
     return () => authListener.unsubscribe();
   }, []);
+
+  const copyPixCode = () => {
+    if (pixData?.pixCode) {
+      navigator.clipboard.writeText(pixData.pixCode);
+      toast.success("Código PIX copiado!");
+    }
+  };
 
   const handleSubscribe = async () => {
     if (!user) {
@@ -45,11 +53,11 @@ export default function Planos() {
 
       if (error) throw error;
 
-      if (data?.paymentUrl) {
-        // Redireciona para a página de pagamento do Punshipay
-        window.location.href = data.paymentUrl;
+      if (data?.pixCode) {
+        setPixData(data);
+        toast.success("PIX gerado com sucesso! Copie o código abaixo para pagar");
       } else {
-        toast.error("Erro ao criar pagamento");
+        toast.error("Erro ao criar pagamento PIX");
       }
     } catch (error: any) {
       console.error('Error creating payment:', error);
@@ -101,6 +109,50 @@ export default function Planos() {
                     Restam {daysRemaining} {daysRemaining === 1 ? 'dia' : 'dias'} de teste grátis
                   </span>
                 </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* QR Code PIX */}
+        {pixData && (
+          <Card className="max-w-2xl mx-auto mb-8 p-8 border-2 border-primary">
+            <div className="text-center">
+              <div className="mb-6">
+                <QrCode className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-2xl font-bold mb-2">PIX Gerado com Sucesso!</h3>
+                <p className="text-muted-foreground">
+                  Escaneie o QR Code ou copie o código abaixo para pagar
+                </p>
+              </div>
+
+              {pixData.pixCodeBase64 && (
+                <div className="mb-6 flex justify-center">
+                  <img 
+                    src={pixData.pixCodeBase64} 
+                    alt="QR Code PIX" 
+                    className="max-w-xs border-4 border-primary rounded-lg"
+                  />
+                </div>
+              )}
+
+              <div className="bg-muted p-4 rounded-lg mb-4">
+                <p className="text-sm font-mono break-all mb-3">{pixData.pixCode}</p>
+                <Button 
+                  onClick={copyPixCode}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copiar Código PIX
+                </Button>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  ℹ️ Após o pagamento, sua assinatura será ativada automaticamente em poucos segundos.
+                  Você receberá acesso completo por 30 dias.
+                </p>
               </div>
             </div>
           </Card>
@@ -210,7 +262,7 @@ export default function Planos() {
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processando...
+                      Gerando PIX...
                     </>
                   ) : (
                     <>
@@ -232,7 +284,7 @@ export default function Planos() {
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processando...
+                    Gerando PIX...
                   </>
                 ) : !user ? (
                   'Faça login para assinar'

@@ -14,76 +14,88 @@ serve(async (req) => {
   try {
     const webhookSecret = Deno.env.get('PUNSHIPAY_WEBHOOK_SECRET');
     if (!webhookSecret) {
+      console.error('Webhook secret not configured');
       throw new Error('Webhook secret not configured');
     }
 
-    // Verificar assinatura do webhook (se o Punshipay usar)
-    const signature = req.headers.get('x-punshipay-signature');
-    // Aqui você implementaria a validação da assinatura conforme documentação do Punshipay
-    
     const payload = await req.json();
-    console.log('Webhook received:', payload);
+    console.log('Webhook received from Pushinpay:', JSON.stringify(payload, null, 2));
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Processar evento do webhook
-    const { event, data } = payload;
+    // O webhook do Pushinpay retorna o status da transação
+    const transactionId = payload.id;
+    const status = payload.status; // 'created', 'paid', 'expired', 'canceled'
 
-    if (event === 'payment.approved' || event === 'payment.confirmed') {
-      const transactionId = data.id;
-      const metadata = data.metadata;
+    if (!transactionId) {
+      console.error('No transaction ID in webhook payload');
+      return new Response(JSON.stringify({ error: 'Invalid payload' }), { 
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
 
-      if (!metadata?.user_id) {
-        console.error('No user_id in metadata');
-        return new Response(JSON.stringify({ error: 'Invalid metadata' }), { 
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
+    // Buscar assinatura pelo transaction_id
+    const { data: subscriptions, error: fetchError } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('punshipay_transaction_id', transactionId)
+      .single();
 
-      // Calcular data de expiração (30 dias a partir de agora)
+    if (fetchError || !subscriptions) {
+      console.error('Subscription not found for transaction:', transactionId);
+      return new Response(JSON.stringify({ error: 'Subscription not found' }), { 
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Processar evento do webhook baseado no status
+    if (status === 'paid') {
+      // Pagamento confirmado - ativar assinatura
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 30);
 
-      // Atualizar assinatura para ativa (remove trial)
       const { error: updateError } = await supabase
         .from('subscriptions')
         .update({
           status: 'active',
           started_at: new Date().toISOString(),
           expires_at: expiresAt.toISOString(),
-          punshipay_transaction_id: transactionId,
-          trial_ends_at: null // Limpa o trial quando ativa a assinatura
+          trial_ends_at: null // Remove o trial quando ativa a assinatura
         })
-        .eq('user_id', metadata.user_id);
+        .eq('punshipay_transaction_id', transactionId);
 
       if (updateError) {
         console.error('Error updating subscription:', updateError);
         throw updateError;
       }
 
-      console.log(`Subscription activated for user ${metadata.user_id}, trial removed`);
-    } else if (event === 'payment.failed' || event === 'payment.cancelled') {
-      const metadata = data.metadata;
+      console.log(`✅ Subscription activated for user ${subscriptions.user_id}, trial removed`);
       
-      if (metadata?.user_id) {
-        // Marcar assinatura como inativa (não mexe no trial)
-        await supabase
-          .from('subscriptions')
-          .update({ 
-            status: 'inactive',
-            punshipay_transaction_id: null
-          })
-          .eq('user_id', metadata.user_id);
+    } else if (status === 'expired' || status === 'canceled') {
+      // Pagamento expirou ou foi cancelado
+      const { error: updateError } = await supabase
+        .from('subscriptions')
+        .update({ 
+          status: 'inactive',
+          punshipay_transaction_id: null
+        })
+        .eq('punshipay_transaction_id', transactionId);
 
-        console.log(`Payment failed/cancelled for user ${metadata.user_id}`);
+      if (updateError) {
+        console.error('Error updating subscription:', updateError);
       }
+
+      console.log(`❌ Payment ${status} for user ${subscriptions.user_id}`);
+    } else {
+      console.log(`ℹ️ Payment status: ${status} for transaction ${transactionId}`);
     }
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, status }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
