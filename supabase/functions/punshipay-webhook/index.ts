@@ -18,8 +18,25 @@ serve(async (req) => {
       throw new Error('Webhook secret not configured');
     }
 
-    const payload = await req.json();
-    console.log('Webhook received from Pushinpay:', JSON.stringify(payload, null, 2));
+    // Pushinpay envia dados em formato URL-encoded
+    const contentType = req.headers.get('content-type') || '';
+    let payload: any;
+
+    if (contentType.includes('application/json')) {
+      payload = await req.json();
+    } else {
+      // Parse URL-encoded data
+      const text = await req.text();
+      console.log('Webhook received (raw):', text);
+      
+      payload = {};
+      const params = new URLSearchParams(text);
+      for (const [key, value] of params.entries()) {
+        payload[key] = value;
+      }
+    }
+
+    console.log('Webhook payload parsed:', JSON.stringify(payload, null, 2));
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
