@@ -21,7 +21,6 @@ export function VendasForm({ onSuccess }: VendasFormProps) {
   const [produto, setProduto] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [valorTotal, setValorTotal] = useState("");
-  const [data, setData] = useState(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +45,7 @@ export function VendasForm({ onSuccess }: VendasFormProps) {
           produto: produto,
           quantidade: parseInt(quantidade),
           valor_total: parseFloat(valorTotal),
-          data: data,
+          data: formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'),
           user_id: userData.user.id,
         });
 
@@ -70,7 +69,6 @@ export function VendasForm({ onSuccess }: VendasFormProps) {
       setProduto("");
       setQuantidade("");
       setValorTotal("");
-      setData(formatInTimeZone(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'));
       onSuccess();
     } catch (error: any) {
       toast({
@@ -127,16 +125,6 @@ export function VendasForm({ onSuccess }: VendasFormProps) {
             placeholder="0.00"
             value={valorTotal}
             onChange={(e) => setValorTotal(e.target.value)}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="data">Data</Label>
-          <Input
-            id="data"
-            type="date"
-            value={data}
-            onChange={(e) => setData(e.target.value)}
             required
           />
         </div>

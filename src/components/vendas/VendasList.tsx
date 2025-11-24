@@ -88,7 +88,7 @@ export function VendasList({ refresh }: VendasListProps) {
                 {venda.produto} • {venda.quantidade} unidades • R$ {venda.valor_total.toFixed(2)}
               </div>
               <div className="text-xs text-muted-foreground">
-                {new Date(venda.data).toLocaleDateString('pt-BR')}
+                Registrado em: {new Date(venda.created_at).toLocaleDateString('pt-BR')}
               </div>
             </div>
             <Button
