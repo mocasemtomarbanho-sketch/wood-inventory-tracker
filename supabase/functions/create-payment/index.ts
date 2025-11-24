@@ -27,8 +27,8 @@ serve(async (req) => {
       throw new Error('Pushinpay token not configured');
     }
 
-    // Valor do plano mensal (R$ 100,00 em centavos)
-    const amount = 10000;
+    // Valor de teste (R$ 1,00 em centavos)
+    const amount = 100;
 
     // Criar ou atualizar assinatura com status pending
     const { error: subscriptionError } = await supabase
